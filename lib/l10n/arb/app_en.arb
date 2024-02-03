@@ -1,0 +1,11 @@
+{
+    "@@locale": "en",
+    "editorAppBarTitle": "Web Walkly clips",
+    "@counterAppBarTitle": {
+        "description": "Text shown in the AppBar of the Counter Page"
+    },
+
+    "back": "Back",
+    "close": "Close",
+    "next": "NEXT"
+}
