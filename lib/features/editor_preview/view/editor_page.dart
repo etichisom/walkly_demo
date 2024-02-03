@@ -144,70 +144,88 @@ class _VideoTimeline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
+      alignment: Alignment.center,
       children: [
-        SizedBox(
+        const SizedBox(
           height: 150,
         ),
         BlocBuilder<EditorCubit, EditorState>(
           builder: (context, state) {
-            return SizedBox(
-              height: 50,
-              width: double.maxFinite,
-              child: RotatedBox(
-                quarterTurns: 3,
-                child: ListWheelScrollView.useDelegate(
-                  //controller: scrollController,
-                  itemExtent: 50,
-                  perspective: 0.001,
-                  diameterRatio: 4,
-                  physics: const FixedExtentScrollPhysics(),
-                  onSelectedItemChanged: (index) {
-                    //print('hahah');
-                    controller.seekTo(Duration(seconds: index));
-                  },
-                  childDelegate: ListWheelChildBuilderDelegate(
-                    childCount: state.timelines.length,
-                    builder: (context, index) {
-                      final data = state.timelines[index];
-                      const radius = Radius.circular(6);
-                      const padding = 5.0;
-                      return RotatedBox(
-                        quarterTurns: 1,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                           // left: data.isStart ? padding : 0,
-                            right: data.isEnd ? padding : 0,
-                          ),
-                          child: Container(
-                            width: 50,
-                            decoration: BoxDecoration(
-                              color: Colors.blueAccent,
-                              borderRadius: BorderRadius.only(
-                                topLeft: data.isStart ? radius : Radius.zero,
-                                topRight: data.isEnd ? radius : Radius.zero,
-                                bottomLeft: data.isStart ? radius : Radius.zero,
-                                bottomRight: data.isEnd ? radius : Radius.zero,
+            return Container(
+              height: 150,
+              color: Colors.yellow,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 50,
+                    width: double.maxFinite,
+                    child: RotatedBox(
+                      quarterTurns: 3,
+                      child: ListWheelScrollView.useDelegate(
+                        //controller: scrollController,
+                        itemExtent: 50,
+                        perspective: 0.001,
+                        diameterRatio: 4,
+                        physics: const FixedExtentScrollPhysics(),
+                        onSelectedItemChanged: (index) {
+                          //print('hahah');
+                          controller.seekTo(Duration(seconds: index));
+                        },
+                        childDelegate: ListWheelChildBuilderDelegate(
+                          childCount: state.timelines.length,
+                          builder: (context, index) {
+                            final data = state.timelines[index];
+                            const radius = Radius.circular(6);
+                            const padding = 5.0;
+                            return RotatedBox(
+                              quarterTurns: 1,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  // left: data.isStart ? padding : 0,
+                                  right: data.isEnd ? padding : 0,
+                                ),
+                                child: Container(
+                                  width: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blueAccent,
+                                    borderRadius: BorderRadius.only(
+                                      topLeft:
+                                          data.isStart ? radius : Radius.zero,
+                                      topRight:
+                                          data.isEnd ? radius : Radius.zero,
+                                      bottomLeft:
+                                          data.isStart ? radius : Radius.zero,
+                                      bottomRight:
+                                          data.isEnd ? radius : Radius.zero,
+                                    ),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text('${data.value}'),
+                                ),
                               ),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text('${data.value}'),
-                          ),
+                            );
+                          },
                         ),
-                      );
-                    },
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             );
           },
         ),
-        const IgnorePointer(
-          child: Center(
-            child: SizedBox(
-              height: 100,
-              child: VerticalDivider(
-                color: Colors.greenAccent, // Adjust the color of the vertical line
-                thickness: 5, // Adjust the width of the vertical line
+        const Positioned(
+          bottom: 0,
+          child: IgnorePointer(
+            child: Center(
+              child: SizedBox(
+                height: 120,
+                child: VerticalDivider(
+                  color: Colors.greenAccent,
+                  // Adjust the color of the vertical line
+                  thickness: 5, // Adjust the width of the vertical line
+                ),
               ),
             ),
           ),
