@@ -178,6 +178,9 @@ https://github.com/etichisom/walkly_demo/assets/65232750/d4b625e5-65ee-4aad-8c9b
 
 
 [Web link](https://walk-c6ca1.web.app/)
+
+
+
 [apk](https://drive.google.com/file/d/1mwPxEbaIvCz4U48jcGdJUMm6FtT_p6OO/view?usp=sharing)
 
 [license_badge]: https://img.shields.io/badge/license-MIT-blue.svg
