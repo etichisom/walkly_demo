@@ -14,8 +14,7 @@ class VideoTimeLine extends Equatable {
   final String? text;
 
   @override
-  List<Object?> get props =>
-      [
+  List<Object?> get props => [
         value,
         isStart,
         isEnd,

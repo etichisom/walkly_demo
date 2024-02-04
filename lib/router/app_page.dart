@@ -1,4 +1,3 @@
-class AppPages{
-  static const String home = "/";
-
+class AppPages {
+  static const String home = '/';
 }
