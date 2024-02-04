@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pod_player/pod_player.dart';
 import 'package:video_player/video_player.dart';
 import 'package:walkly/features/editor_preview/cubit/editor_cubit.dart';
 import 'package:walkly/features/editor_preview/cubit/editor_state.dart';
@@ -39,7 +40,7 @@ class _DesktopEditorView extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(
-              width: 400,
+              width: 360,
               height: size.height,
               child: const _EditorUi(),
             ),
@@ -58,36 +59,44 @@ class _EditorUi extends StatefulWidget {
 }
 
 class _EditorUiState extends State<_EditorUi> {
-  late VideoPlayerController _controller;
+  late PodPlayerController _controller;
   final PageController _pageController = PageController(
     viewportFraction: 0.12,
   );
 
   @override
+  void dispose() {
+   _controller.dispose();
+    super.dispose();
+  }
+  @override
   void initState() {
     super.initState();
     final cubit = context.read<EditorCubit>();
-    _controller = VideoPlayerController.networkUrl(
-      Uri.parse(VIDEO_URL),
-    )..initialize().then((_) {
-        cubit.init(_controller.value.duration.inSeconds);
+    _controller = PodPlayerController(
+      podPlayerConfig: const PodPlayerConfig(
+        autoPlay: false,
+      ),
+      playVideoFrom: PlayVideoFrom.network(
+        VIDEO_URL,
+      ),
+    )..initialise().then((value) {
+        cubit.init(_controller.totalVideoLength.inSeconds);
       });
 
     _controller.addListener(() async {
       cubit.updateIsPlaying(
-        isPlaying: _controller.value.isPlaying,
+        isPlaying: _controller.isVideoPlaying,
       );
-      if (_controller.value.isPlaying) {
-        final position = await _controller.position;
-        if (position != null) {
-          await _pageController.animateToPage(
-            position.inSeconds,
-            curve: Curves.ease,
-            duration: const Duration(
-              milliseconds: 300,
-            ),
-          );
-        }
+      if (_controller.isVideoPlaying) {
+        final position = _controller.currentVideoPosition.inSeconds;
+        await _pageController.animateToPage(
+          position,
+          curve: Curves.ease,
+          duration: const Duration(
+            milliseconds: 300,
+          ),
+        );
       }
     });
   }
@@ -150,7 +159,7 @@ class _EditorUiState extends State<_EditorUi> {
       ),
       body: BlocBuilder<EditorCubit, EditorState>(
         builder: (context, state) {
-          if (!_controller.value.isInitialized) {
+          if (!_controller.isInitialised) {
             return const Center(
               child: CircularProgressIndicator(),
             );
@@ -158,22 +167,28 @@ class _EditorUiState extends State<_EditorUi> {
           return Column(
             children: [
               const SizedBox(
-                height: 30,
+                height: 20,
               ),
-              if (_controller.value.isInitialized)
+              if (_controller.isInitialised)
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
+                      horizontal: 10,
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(
                         10,
                       ),
                       child: AspectRatio(
-                        aspectRatio: _controller.value.aspectRatio,
-                        child: VideoPlayer(
-                          _controller,
+                        aspectRatio: 16 / 20,
+                        child: PodVideoPlayer(
+                          videoAspectRatio: 16 / 20,
+                          frameAspectRatio: 16 / 20,
+                          controller: _controller,
+                          overlayBuilder: (c) {
+                            return const SizedBox();
+                          },
+                          alwaysShowProgressBar: false,
                         ),
                       ),
                     ),
@@ -219,7 +234,7 @@ class _EditorUiState extends State<_EditorUi> {
                         size: 35,
                       ),
                       onPressed: () {
-                        _controller.value.isPlaying
+                        _controller.isVideoPlaying
                             ? _controller.pause()
                             : _controller.play();
                       },
@@ -267,7 +282,7 @@ class _VideoTimeline extends StatelessWidget {
     required this.pageController,
   });
 
-  final VideoPlayerController controller;
+  final PodPlayerController controller;
   final PageController pageController;
 
   @override
@@ -287,7 +302,7 @@ class _VideoTimeline extends StatelessWidget {
                 controller: pageController,
                 onPageChanged: (index) {
                   if (!state.isPlaying) {
-                    controller.seekTo(Duration(seconds: index));
+                    controller.videoSeekTo(Duration(seconds: index));
                   }
                   context.read<EditorCubit>().updateArea(
                         area: state.timelines[index].text,

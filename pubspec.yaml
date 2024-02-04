@@ -18,6 +18,7 @@ dependencies:
   intl: ^0.18.0
   scroll_snap_list: ^0.9.1
   video_player: ^2.8.2
+  pod_player: ^0.2.1
 
 dev_dependencies:
   bloc_test: ^9.1.4
