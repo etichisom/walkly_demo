@@ -6,7 +6,6 @@ import 'package:walkly/features/editor_preview/cubit/editor_state.dart';
 import 'package:walkly/l10n/l10n.dart';
 import 'package:walkly/service/video_tineline_service.dart';
 import 'package:walkly/utils/const.dart';
-import 'package:walkly/widget/list_view_x.dart';
 
 class EditorPage extends StatelessWidget {
   const EditorPage({super.key});
@@ -31,7 +30,9 @@ class CounterView extends StatefulWidget {
 
 class _CounterViewState extends State<CounterView> {
   late VideoPlayerController _controller;
-  final ScrollController _scrollController = ScrollController();
+  final PageController _pageController = PageController(
+    viewportFraction: 0.1,
+  );
 
   @override
   void initState() {
@@ -43,15 +44,21 @@ class _CounterViewState extends State<CounterView> {
         cubit.init(_controller.value.duration.inSeconds);
       });
 
-    _controller.addListener(() {
+    _controller.addListener(() async {
       cubit.updateIsPlaying(
         isPlaying: _controller.value.isPlaying,
       );
-      // _scrollController.animateTo(
-      //   _controller.value.duration.inSeconds.toDouble(),
-      //   duration: const Duration(milliseconds: 100),
-      //   curve: Curves.ease,
-      // );
+      if (_controller.value.isPlaying) {
+        final position = await _controller.position;
+        if (position != null) {
+          await _pageController.animateToPage(
+            position.inSeconds,
+            curve: Curves.ease,
+            duration: const Duration(milliseconds: 500),
+          );
+        }
+      }
+      //_pageController.jumpToPage(_controller.value.duration.inSeconds);
     });
   }
 
@@ -84,7 +91,7 @@ class _CounterViewState extends State<CounterView> {
               ),
               _VideoTimeline(
                 controller: _controller,
-                scrollController: _scrollController,
+                pageController: _pageController,
               ),
               const SizedBox(
                 height: 20,
@@ -135,11 +142,11 @@ class _CounterViewState extends State<CounterView> {
 class _VideoTimeline extends StatelessWidget {
   const _VideoTimeline({
     required this.controller,
-    required this.scrollController,
+    required this.pageController,
   });
 
   final VideoPlayerController controller;
-  final ScrollController scrollController;
+  final PageController pageController;
 
   @override
   Widget build(BuildContext context) {
@@ -151,72 +158,60 @@ class _VideoTimeline extends StatelessWidget {
         ),
         BlocBuilder<EditorCubit, EditorState>(
           builder: (context, state) {
-            return Container(
-              height: 150,
-              color: Colors.yellow,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: 50,
-                    width: double.maxFinite,
-                    child: RotatedBox(
-                      quarterTurns: 3,
-                      child: ListWheelScrollView.useDelegate(
-                        //controller: scrollController,
-                        itemExtent: 50,
-                        perspective: 0.001,
-                        diameterRatio: 4,
-                        physics: const FixedExtentScrollPhysics(),
-                        onSelectedItemChanged: (index) {
-                          //print('hahah');
-                          controller.seekTo(Duration(seconds: index));
-                        },
-                        childDelegate: ListWheelChildBuilderDelegate(
-                          childCount: state.timelines.length,
-                          builder: (context, index) {
-                            final data = state.timelines[index];
-                            const radius = Radius.circular(6);
-                            const padding = 5.0;
-                            return RotatedBox(
-                              quarterTurns: 1,
-                              child: Padding(
-                                padding: EdgeInsets.only(
-                                  // left: data.isStart ? padding : 0,
-                                  right: data.isEnd ? padding : 0,
-                                ),
-                                child: Container(
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.blueAccent,
-                                    borderRadius: BorderRadius.only(
-                                      topLeft:
-                                          data.isStart ? radius : Radius.zero,
-                                      topRight:
-                                          data.isEnd ? radius : Radius.zero,
-                                      bottomLeft:
-                                          data.isStart ? radius : Radius.zero,
-                                      bottomRight:
-                                          data.isEnd ? radius : Radius.zero,
-                                    ),
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Text('${data.value}'),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+            return SizedBox(
+              height: 100,
+              child: PageView.builder(
+                itemCount: state.timelines.length,
+                controller: pageController,
+                onPageChanged: (index) {
+                  if(!state.isPlaying){
+                    controller.seekTo(Duration(seconds: index));
+                  }
+                },
+                itemBuilder: (context, index) {
+                  final data = state.timelines[index];
+                  const radius = Radius.circular(6);
+                  const padding = 5.0;
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      right: data.isEnd ? padding : 0,
                     ),
-                  ),
-                ],
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.blueAccent,
+                            borderRadius: BorderRadius.only(
+                              topLeft: data.isStart ? radius : Radius.zero,
+                              topRight: data.isEnd ? radius : Radius.zero,
+                              bottomLeft: data.isStart ? radius : Radius.zero,
+                              bottomRight: data.isEnd ? radius : Radius.zero,
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text('${data.value}'),
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          data.text ?? '',
+                          style: const TextStyle(
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             );
           },
         ),
         const Positioned(
-          bottom: 0,
+          bottom: 5,
           child: IgnorePointer(
             child: Center(
               child: SizedBox(
@@ -224,7 +219,7 @@ class _VideoTimeline extends StatelessWidget {
                 child: VerticalDivider(
                   color: Colors.greenAccent,
                   // Adjust the color of the vertical line
-                  thickness: 5, // Adjust the width of the vertical line
+                  thickness: 4, // Adjust the width of the vertical line
                 ),
               ),
             ),

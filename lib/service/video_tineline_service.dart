@@ -72,14 +72,15 @@ class VideoTimeLineServices {
     final list = List.generate(duration, (index) => index);
     final timeLine = getVideoTimeLineFromVideo();
     for (final index in list) {
-      final isStart = timeLine.any((element) => element.startAt == index);
+      final isStart = timeLine.where((element) => element.startAt == index);
       final isEnd = timeLine.any((element) => element.stopAt == index);
       final value = _getValue(index, timeLine);
       videoTimelines.add(
         VideoTimeLine(
           value: value,
-          isStart: isStart,
+          isStart: isStart.isNotEmpty,
           isEnd: isEnd,
+          text: isStart.isNotEmpty ? isStart.first.name : null,
         ),
       );
     }
