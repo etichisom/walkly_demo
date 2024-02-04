@@ -1,5 +1,5 @@
 import 'package:go_router/go_router.dart';
-import 'package:walkly/features/editor_preview/view/editor_page.dart';
+import 'package:walkly/features/editor_preview/view/editor_view.dart';
 import 'package:walkly/router/app_page.dart';
 
 class AppRoute {
@@ -8,7 +8,7 @@ class AppRoute {
     routes: [
       GoRoute(
         path: AppPages.home,
-        builder: (context, state) => const EditorPage(),
+        builder: (context, state) => const EditorView(),
       ),
     ],
   );

@@ -7,9 +7,10 @@ import 'package:walkly/l10n/l10n.dart';
 import 'package:walkly/service/video_tineline_service.dart';
 import 'package:walkly/utils/const.dart';
 import 'package:walkly/widget/icon_button.dart';
+import 'package:walkly/widget/responsive_layout.dart';
 
-class EditorPage extends StatelessWidget {
-  const EditorPage({super.key});
+class EditorView extends StatelessWidget {
+  const EditorView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,22 +18,49 @@ class EditorPage extends StatelessWidget {
       create: (_) => EditorCubit(
         videoTimeLineServices: VideoTimeLineServices(),
       ),
-      child: const CounterView(),
+      child: const ResponsiveLayout(
+        mobileWidget: _EditorUi(),
+        desktopWidget: _DesktopEditorView(),
+      ),
     );
   }
 }
 
-class CounterView extends StatefulWidget {
-  const CounterView({super.key});
+class _DesktopEditorView extends StatelessWidget {
+  const _DesktopEditorView();
 
   @override
-  State<CounterView> createState() => _CounterViewState();
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return Scaffold(
+      backgroundColor: Theme.of(context).iconTheme.color,
+      body: SizedBox(
+        width: size.width,
+        child: Column(
+          children: [
+            SizedBox(
+              width: 400,
+              height: size.height,
+              child: const _EditorUi(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class _CounterViewState extends State<CounterView> {
+class _EditorUi extends StatefulWidget {
+  const _EditorUi();
+
+  @override
+  State<_EditorUi> createState() => _EditorUiState();
+}
+
+class _EditorUiState extends State<_EditorUi> {
   late VideoPlayerController _controller;
   final PageController _pageController = PageController(
-    viewportFraction: 0.138,
+    viewportFraction: 0.12,
   );
 
   @override
@@ -103,7 +131,9 @@ class _CounterViewState extends State<CounterView> {
                     ],
                   ),
                 ),
-                Text(l10n.editorAppBarTitle),
+                Text(
+                  l10n.editorAppBarTitle,
+                ),
                 TextButton(
                   onPressed: () {},
                   child: Text(
@@ -120,6 +150,11 @@ class _CounterViewState extends State<CounterView> {
       ),
       body: BlocBuilder<EditorCubit, EditorState>(
         builder: (context, state) {
+          if (!_controller.value.isInitialized) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
           return Column(
             children: [
               const SizedBox(
@@ -129,14 +164,17 @@ class _CounterViewState extends State<CounterView> {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
+                      horizontal: 20,
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(
-                        20,
+                        10,
                       ),
-                      child: VideoPlayer(
-                        _controller,
+                      child: AspectRatio(
+                        aspectRatio: _controller.value.aspectRatio,
+                        child: VideoPlayer(
+                          _controller,
+                        ),
                       ),
                     ),
                   ),
