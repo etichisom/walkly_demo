@@ -5,64 +5,64 @@ class VideoTimeLineServices {
   List<VideoPlaces> getVideoTimeLineFromVideo() {
     return [
       const VideoPlaces(
-        name: 'Sitting room',
+        name: 'Sitting',
         floor: 0,
         startAt: 0,
         stopAt: 13,
       ),
       const VideoPlaces(
-        name: 'Dinning area',
+        name: 'Dinning',
         floor: 0,
         startAt: 14,
         stopAt: 30,
       ),
       const VideoPlaces(
-        name: 'Kids area',
+        name: 'Kids',
         floor: 0,
         startAt: 31,
         stopAt: 36,
       ),
       const VideoPlaces(
-        name: 'Kitchen area',
+        name: 'Kitchen',
         floor: 0,
         startAt: 37,
         stopAt: 41,
       ),
       const VideoPlaces(
-        name: 'Game room',
+        name: 'Game',
         floor: 0,
         startAt: 42,
         stopAt: 46,
       ),
       const VideoPlaces(
-        name: 'Stairs area',
+        name: 'Stairs',
         floor: 0,
         startAt: 47,
         stopAt: 54,
       ),
       const VideoPlaces(
-        name: 'landry area',
+        name: 'landry',
         floor: 0,
         startAt: 55,
         stopAt: 64,
       ),
       const VideoPlaces(
-        name: 'Space area',
+        name: 'Space',
         floor: 0,
         startAt: 65,
         stopAt: 70,
       ),
       const VideoPlaces(
-        name: 'Bathroom area',
+        name: 'Bathroom',
         floor: 0,
         startAt: 71,
         stopAt: 81,
       ),
       const VideoPlaces(
-        name: 'Bathroom area',
+        name: 'Bedroom',
         floor: 0,
         startAt: 82,
-        stopAt: 90,
+        stopAt: 89,
       ),
     ];
   }

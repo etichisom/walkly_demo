@@ -10,10 +10,16 @@ class EditorCubit extends Cubit<EditorState> {
   final VideoTimeLineServices videoTimeLineServices;
 
   void init(int duration) {
+    final timeLine = videoTimeLineServices.getTimeline(duration);
+    String? area;
+    if (timeLine.isNotEmpty) {
+      area = timeLine.first.text;
+    }
     emit(
       state.copyWith(
         timelines: videoTimeLineServices.getTimeline(duration),
         isInitialised: true,
+        area: area,
       ),
     );
   }
@@ -25,6 +31,17 @@ class EditorCubit extends Cubit<EditorState> {
     emit(
       state.copyWith(
         isPlaying: isPlaying,
+      ),
+    );
+  }
+
+  void updateArea({
+    required String? area,
+  }) {
+    if (area == null) return;
+    emit(
+      state.copyWith(
+        area: area,
       ),
     );
   }

@@ -6,6 +6,7 @@ import 'package:walkly/features/editor_preview/cubit/editor_state.dart';
 import 'package:walkly/l10n/l10n.dart';
 import 'package:walkly/service/video_tineline_service.dart';
 import 'package:walkly/utils/const.dart';
+import 'package:walkly/widget/icon_button.dart';
 
 class EditorPage extends StatelessWidget {
   const EditorPage({super.key});
@@ -31,7 +32,7 @@ class CounterView extends StatefulWidget {
 class _CounterViewState extends State<CounterView> {
   late VideoPlayerController _controller;
   final PageController _pageController = PageController(
-    viewportFraction: 0.1,
+    viewportFraction: 0.138,
   );
 
   @override
@@ -54,33 +55,89 @@ class _CounterViewState extends State<CounterView> {
           await _pageController.animateToPage(
             position.inSeconds,
             curve: Curves.ease,
-            duration: const Duration(milliseconds: 500),
+            duration: const Duration(
+              milliseconds: 300,
+            ),
           );
         }
       }
-      //_pageController.jumpToPage(_controller.value.duration.inSeconds);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final size = MediaQuery.sizeOf(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.editorAppBarTitle),
-        backgroundColor: Colors.transparent,
+      appBar: PreferredSize(
+        preferredSize: Size(
+          size.width,
+          80,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(
+            top: 20,
+          ),
+          child: SafeArea(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: () {},
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.arrow_back_ios_rounded,
+                        color: Colors.greenAccent,
+                        size: 13,
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        l10n.back,
+                        style: const TextStyle(
+                          color: Colors.greenAccent,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(l10n.editorAppBarTitle),
+                TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    l10n.close,
+                    style: const TextStyle(
+                      color: Colors.greenAccent,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: BlocBuilder<EditorCubit, EditorState>(
         builder: (context, state) {
           return Column(
             children: [
+              const SizedBox(
+                height: 30,
+              ),
               if (_controller.value.isInitialized)
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(30),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                    ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: VideoPlayer(_controller),
+                      borderRadius: BorderRadius.circular(
+                        20,
+                      ),
+                      child: VideoPlayer(
+                        _controller,
+                      ),
                     ),
                   ),
                 )
@@ -89,6 +146,17 @@ class _CounterViewState extends State<CounterView> {
               const SizedBox(
                 height: 20,
               ),
+              if (state.area != null)
+                Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 10,
+                  ),
+                  child: Text(
+                    '${state.area} Area, Floor 0',
+                  ),
+                )
+              else
+                const SizedBox.shrink(),
               _VideoTimeline(
                 controller: _controller,
                 pageController: _pageController,
@@ -101,27 +169,43 @@ class _CounterViewState extends State<CounterView> {
                   horizontal: 20,
                 ),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    InkWell(
-                      onTap: () {
+                    ContainerIcon(
+                      icon: Icon(
+                        state.isPlaying
+                            ? Icons.pause_circle_filled_rounded
+                            : Icons.play_arrow_rounded,
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        size: 35,
+                      ),
+                      onPressed: () {
                         _controller.value.isPlaying
                             ? _controller.pause()
                             : _controller.play();
                       },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.greenAccent,
-                          borderRadius: BorderRadius.circular(10),
+                    ),
+                    ContainerIcon(
+                      icon: Icon(
+                        Icons.exit_to_app_outlined,
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        size: 30,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      style: TextButton.styleFrom(
+                        backgroundColor: Theme.of(context).iconTheme.color,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Icon(
-                            state.isPlaying
-                                ? Icons.pause_circle_filled_rounded
-                                : Icons.play_arrow_rounded,
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            size: 30,
-                          ),
+                      ),
+                      child: Text(
+                        l10n.next,
+                        style: TextStyle(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -129,7 +213,7 @@ class _CounterViewState extends State<CounterView> {
                 ),
               ),
               const SizedBox(
-                height: 20,
+                height: 30,
               ),
             ],
           );
@@ -154,7 +238,7 @@ class _VideoTimeline extends StatelessWidget {
       alignment: Alignment.center,
       children: [
         const SizedBox(
-          height: 150,
+          height: 110,
         ),
         BlocBuilder<EditorCubit, EditorState>(
           builder: (context, state) {
@@ -164,9 +248,12 @@ class _VideoTimeline extends StatelessWidget {
                 itemCount: state.timelines.length,
                 controller: pageController,
                 onPageChanged: (index) {
-                  if(!state.isPlaying){
+                  if (!state.isPlaying) {
                     controller.seekTo(Duration(seconds: index));
                   }
+                  context.read<EditorCubit>().updateArea(
+                        area: state.timelines[index].text,
+                      );
                 },
                 itemBuilder: (context, index) {
                   final data = state.timelines[index];
@@ -177,17 +264,24 @@ class _VideoTimeline extends StatelessWidget {
                       right: data.isEnd ? padding : 0,
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          width: 60,
-                          height: 40,
+                          width: 50,
+                          height: 45,
                           decoration: BoxDecoration(
-                            color: Colors.blueAccent,
+                            color: Colors.purple.shade400,
                             borderRadius: BorderRadius.only(
                               topLeft: data.isStart ? radius : Radius.zero,
                               topRight: data.isEnd ? radius : Radius.zero,
                               bottomLeft: data.isStart ? radius : Radius.zero,
                               bottomRight: data.isEnd ? radius : Radius.zero,
+                            ),
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.indigo,
+                                Colors.indigo.shade600,
+                              ],
                             ),
                           ),
                           alignment: Alignment.center,
@@ -196,12 +290,14 @@ class _VideoTimeline extends StatelessWidget {
                         const SizedBox(
                           height: 5,
                         ),
-                        Text(
-                          data.text ?? '',
-                          style: const TextStyle(
-                            fontSize: 10,
+                        if (data.text != null)
+                          Text(
+                            '${data.text}\nFloor:0',
+                            style: const TextStyle(
+                              fontSize: 7,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   );
@@ -224,9 +320,6 @@ class _VideoTimeline extends StatelessWidget {
               ),
             ),
           ),
-        ),
-        const SizedBox(
-          height: 10,
         ),
       ],
     );
