@@ -169,6 +169,20 @@ Alternatively, run `flutter run` and code generation will take place automatical
 [coverage_badge]: coverage_badge.svg
 [flutter_localizations_link]: https://api.flutter.dev/flutter/flutter_localizations/flutter_localizations-library.html
 [internationalization_link]: https://flutter.dev/docs/development/accessibility-and-localization/internationalization
+
+
+### Demo
+
+
+https://github.com/etichisom/walkly_demo/assets/65232750/d4b625e5-65ee-4aad-8c9b-bb5466c4cc3d
+
+
+[Web link](https://walk-c6ca1.web.app/)
+
+
+
+[apk](https://drive.google.com/file/d/1mwPxEbaIvCz4U48jcGdJUMm6FtT_p6OO/view?usp=sharing)
+
 [license_badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [license_link]: https://opensource.org/licenses/MIT
 [very_good_analysis_badge]: https://img.shields.io/badge/style-very_good_analysis-B22C89.svg
