@@ -66,9 +66,10 @@ class _EditorUiState extends State<_EditorUi> {
 
   @override
   void dispose() {
-   _controller.dispose();
+    _controller.dispose();
     super.dispose();
   }
+
   @override
   void initState() {
     super.initState();
@@ -76,6 +77,7 @@ class _EditorUiState extends State<_EditorUi> {
     _controller = PodPlayerController(
       podPlayerConfig: const PodPlayerConfig(
         autoPlay: false,
+        isLooping: true,
       ),
       playVideoFrom: PlayVideoFrom.network(
         VIDEO_URL,
